@@ -78,6 +78,9 @@ dependencies {
     compile group: 'io.prometheus', name: 'simpleclient_servlet', version: prometheusVersion
 
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    testImplementation 'com.neovisionaries:nv-websocket-client:2.14'
+    testImplementation "io.projectreactor:reactor-core:3.4.15"
+    testImplementation "io.projectreactor:reactor-test:3.4.15"
 }
 
 processResources {
