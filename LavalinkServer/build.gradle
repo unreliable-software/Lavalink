@@ -77,10 +77,12 @@ dependencies {
     compile group: 'io.prometheus', name: 'simpleclient_logback', version: prometheusVersion
     compile group: 'io.prometheus', name: 'simpleclient_servlet', version: prometheusVersion
 
-    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
+    //testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
     testImplementation 'com.neovisionaries:nv-websocket-client:2.14'
     testImplementation "io.projectreactor:reactor-core:3.4.15"
     testImplementation "io.projectreactor:reactor-test:3.4.15"
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.1.0'
+    testRuntime group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.1.0'
 }
 
 processResources {
@@ -145,3 +147,8 @@ versionTxt()
 // https://stackoverflow.com/questions/41444916/multiple-artifacts-issue-with-deploying-zip-to-nexus
 bootDistTar {classifier = 'bootTar'}
 bootDistZip {classifier = 'bootZip'}
+
+test {
+    workingDir = new File("$projectDir/test-workdir")
+    useJUnitPlatform()
+}
