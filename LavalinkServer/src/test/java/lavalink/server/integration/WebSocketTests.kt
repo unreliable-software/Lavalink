@@ -1,6 +1,7 @@
 package lavalink.server.integration
 
 import lavalink.plugin.MockEventHandler
+import lavalink.plugin.TestWsExtension
 import lavalink.server.config.ServerConfig
 import lavalink.server.util.AwaitWebServer
 import lavalink.server.util.SharedSpringContext
@@ -15,10 +16,10 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 @ExtendWith(SharedSpringContext::class, AwaitWebServer::class)
-class WebSocketTest {
+class WebSocketTests {
 
     @Test
-    fun testWebSocket(appProps: ServerConfig, serverProps: ServerProperties) {
+    fun testEvents(appProps: ServerConfig, serverProps: ServerProperties) {
         val ws = TestWsClient("ws://localhost:${serverProps.port}", appProps.password!!)
         val eventHandler = SpringContextProvider.staticContext!!.getBean(MockEventHandler::class.java)
         eventHandler.active = true
@@ -30,6 +31,16 @@ class WebSocketTest {
             .verify(Duration.ofSeconds(3))
 
         eventHandler.latch.await(1, TimeUnit.SECONDS)
+    }
+
+    @Test
+    fun testExtension(appProps: ServerConfig, serverProps: ServerProperties) {
+        val ws = TestWsClient("ws://localhost:${serverProps.port}", appProps.password!!)
+        val extension = SpringContextProvider.staticContext!!.getBean(TestWsExtension::class.java)
+        ws.connect {
+            ws.send(JSONObject().apply { put("op", "extension-test") })
+        }.subscribe()
+        extension.latch.await(2, TimeUnit.SECONDS)
     }
 
 }

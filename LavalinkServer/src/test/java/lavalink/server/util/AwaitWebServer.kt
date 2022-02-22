@@ -8,7 +8,7 @@ import java.net.Socket
 class AwaitWebServer : BeforeAllCallback {
     override fun beforeAll(context: ExtensionContext) {
         val port = SpringContextProvider.staticContext!!.getBean(ServerProperties::class.java).port
-        repeat(20) {
+        repeat(50) {
             try {
                 Socket("localhost", port)
                 return

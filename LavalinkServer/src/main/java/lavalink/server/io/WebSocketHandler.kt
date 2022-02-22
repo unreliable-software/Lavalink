@@ -11,7 +11,6 @@ import moe.kyokobot.koe.VoiceServerInfo
 import org.json.JSONObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import kotlin.reflect.KFunction1
 
 class WebSocketHandler(
     private val context: SocketContext,
@@ -26,7 +25,7 @@ class WebSocketHandler(
     private var loggedVolumeDeprecationWarning = false
     private var loggedEqualizerDeprecationWarning = false
 
-    private val handlers: Map<String, (JSONObject) -> Unit> = mutableMapOf(
+    private val handlers: MutableMap<String, (JSONObject) -> Unit> = mutableMapOf(
         "voiceUpdate" to ::voiceUpdate,
         "play" to ::play,
         "stop" to ::stop,
@@ -37,10 +36,11 @@ class WebSocketHandler(
         "filters" to ::filters,
         "destroy" to ::destroy,
         "configureResuming" to ::configureResuming
-    ).apply {
+    )
+
+    init {
         wsExtensions.forEach {
-            val func = fun(json: JSONObject) { it.onInvocation(context, json) }
-            this[it.opName] = func as KFunction1<JSONObject, Unit>
+            handlers[it.opName] = { j -> it.onInvocation(context, j) }
         }
     }
 
