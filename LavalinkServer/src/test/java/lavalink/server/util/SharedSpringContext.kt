@@ -1,7 +1,6 @@
 package lavalink.server.util
 
 import lavalink.server.Launcher
-import org.junit.jupiter.api.extension.AfterEachCallback
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
@@ -17,7 +16,7 @@ import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 /** Adapted from FredBoat */
-class SharedSpringContext : ParameterResolver, BeforeAllCallback, AfterEachCallback {
+class SharedSpringContext : ParameterResolver, BeforeAllCallback {
 
     companion object {
         private val log: Logger = LoggerFactory.getLogger(SharedSpringContext::class.java)
@@ -46,11 +45,6 @@ class SharedSpringContext : ParameterResolver, BeforeAllCallback, AfterEachCallb
         log.info("Acquired Spring context after ${(currentTimeMillis() - start)/1000} seconds")
         application = SpringContextProvider.staticContext
 
-        try {
-            // Context may or may not be refreshed yet. Refreshing too many times will throw an exception
-            application!!.refresh()
-        } catch (ignored: IllegalStateException) {}
-
         log.info("Successfully initialized test context ${application!!.javaClass.simpleName}")
     }
 
@@ -70,6 +64,4 @@ class SharedSpringContext : ParameterResolver, BeforeAllCallback, AfterEachCallb
 
         return application!!.getBean(qualifier.value, parameterContext.parameter.type)
     }
-
-    override fun afterEach(context: ExtensionContext) {}
 }

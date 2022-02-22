@@ -6,10 +6,12 @@ import com.neovisionaries.ws.client.WebSocketException
 import com.neovisionaries.ws.client.WebSocketFactory
 import com.neovisionaries.ws.client.WebSocketFrame
 import org.json.JSONObject
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.FluxSink
 
-class MockClient(uri: String, password: String): WebSocketAdapter() {
+class TestWsClient(uri: String, password: String): WebSocketAdapter() {
 
     private val socket: WebSocket
     private lateinit var sink: FluxSink<JSONObject>
@@ -22,9 +24,10 @@ class MockClient(uri: String, password: String): WebSocketAdapter() {
              .addListener(this)
     }
 
-    fun connect(): Flux<JSONObject> = Flux.create { sink ->
+    fun connect(postConnect: (() -> Unit)? = null): Flux<JSONObject> = Flux.create { sink ->
         this.sink = sink
-        socket.connectAsynchronously()
+        socket.connect()
+        if (postConnect != null) postConnect()
     }
 
     fun send(json: JSONObject) {
@@ -36,8 +39,14 @@ class MockClient(uri: String, password: String): WebSocketAdapter() {
         socket.sendClose()
     }
 
-    override fun onTextMessage(websocket: WebSocket, data: ByteArray) {
-        sink.next(JSONObject(String(data)))
+    private val log: Logger = LoggerFactory.getLogger(TestWsClient::class.java)
+
+    override fun onFrame(websocket: WebSocket?, frame: WebSocketFrame?) {
+        log.info(frame.toString())
+    }
+
+    override fun onTextMessage(websocket: WebSocket?, text: String?) {
+        sink.next(JSONObject(text))
     }
 
     override fun onCloseFrame(websocket: WebSocket, frame: WebSocketFrame) {
