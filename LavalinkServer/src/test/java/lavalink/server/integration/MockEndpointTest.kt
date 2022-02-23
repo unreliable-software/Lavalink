@@ -16,7 +16,7 @@ import java.net.http.HttpResponse
 class MockEndpointTest {
 
     @Test
-    fun testPluginsEndpoint(appProps: ServerConfig, serverProps: ServerProperties) {
+    fun testCustomEndpoint(appProps: ServerConfig, serverProps: ServerProperties) {
         val client = HttpClient.newHttpClient()
         val request = HttpRequest.newBuilder()
             .GET()

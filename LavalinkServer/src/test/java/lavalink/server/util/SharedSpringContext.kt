@@ -25,8 +25,8 @@ class SharedSpringContext : ParameterResolver, BeforeAllCallback {
 
     override fun beforeAll(context: ExtensionContext) {
         // Delete mock plugin so it is always downloaded
-        File("plugin").listFiles()?.forEach {
-            if (it.startsWith("lavalink-mock-plugin")) it.delete()
+        File("plugins").listFiles()?.forEach {
+            if (it.name.startsWith("lavalink-mock-plugin")) it.delete()
         }
 
         if (application != null) return // Don't start the application again

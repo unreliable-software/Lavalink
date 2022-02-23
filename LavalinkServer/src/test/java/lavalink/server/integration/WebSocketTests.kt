@@ -1,6 +1,7 @@
 package lavalink.server.integration
 
 import lavalink.plugin.MockEventHandler
+import lavalink.plugin.TestFilterExtension
 import lavalink.plugin.TestWsExtension
 import lavalink.server.config.ServerConfig
 import lavalink.server.util.AwaitWebServer
@@ -34,11 +35,25 @@ class WebSocketTests {
     }
 
     @Test
-    fun testExtension(appProps: ServerConfig, serverProps: ServerProperties) {
+    fun testWsExtension(appProps: ServerConfig, serverProps: ServerProperties) {
         val ws = TestWsClient("ws://localhost:${serverProps.port}", appProps.password!!)
         val extension = SpringContextProvider.staticContext!!.getBean(TestWsExtension::class.java)
         ws.connect {
             ws.send(JSONObject().apply { put("op", "extension-test") })
+        }.subscribe()
+        extension.latch.await(2, TimeUnit.SECONDS)
+    }
+
+    @Test
+    fun testFilterExtension(appProps: ServerConfig, serverProps: ServerProperties) {
+        val ws = TestWsClient("ws://localhost:${serverProps.port}", appProps.password!!)
+        val extension = SpringContextProvider.staticContext!!.getBean(TestFilterExtension::class.java)
+        ws.connect {
+            ws.send(JSONObject().apply {
+                put("op", "filters")
+                put("guildId", "0")
+                put("test", JSONObject())
+            })
         }.subscribe()
         extension.latch.await(2, TimeUnit.SECONDS)
     }
